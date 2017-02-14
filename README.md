@@ -29,7 +29,7 @@ when objname changed, the template will rerender as virtual dom and patch it.
 
 {key} is print value from current context.
 
-eg.
+here's a simple buy cart:
 
 ```javascript
 <script>
@@ -50,20 +50,67 @@ eg.
         ],
         cart: {}
     }
+
+    function addtocart(item) {
+        if (data.cart[item.name]) {
+            data.cart[item.name].count += 1;
+        }
+        else
+            data.cart[item.name] = ({
+                name: item.name,
+                price: item.price,
+                count: 1
+            })
+    }
+    function gettotal() {
+        var total = 0;
+        for (var i in data.cart) {
+            total += data.cart[i].price * data.cart[i].count;
+        }
+        return total;
+    }
 </script>
 
 <script type=text/html c-tpl=data c-tag=center>
-{each item,index in cart}
-<tr>
-    <td>{name}</td>
-    <td>{price | money}</td>
-    <td><input name="cart[{index}][count]" type="number" min=1 value={count}></td>
-    <td>{price * count | money}</td>
-    <td>
-        <a href="javascript:;" onclick="delete data.cart.{index}">remove</a>
-    </td>
-</tr>
-{ end }
+
+    <ul>
+        {each in data.goods}
+        <li>
+            name : {name} ,
+            price : {price | money}
+            <a href="javascript:;" onclick="addtocart({$current})">add to cart</a>
+        </li>
+        {end }
+    </ul>
+
+    <table>
+        <tr>
+            <th>name</th>
+            <th>price</th>
+            <th>count</th>
+            <th>total</th>
+        </tr>
+
+        {each item,index in cart}
+        <tr>
+            <td>{name}</td>
+            <td>{price | money}</td>
+            <td><input name="cart[{index}][count]" type="number" min=1 value={count}></td>
+            <td>{price * count | money}</td>
+            <td>
+                <a href="javascript:;" onclick="delete data.cart.{index}">remove</a>
+            </td>
+        </tr>
+        { end }
+    </table>
+
+    <hr>
+
+    <center>
+        total : {
+            gettotal() | money
+        }
+    </center>
 </script>
 
 ```
