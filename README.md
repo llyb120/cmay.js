@@ -21,10 +21,13 @@ a lightweight javascript dynamic template just like mvvm framwork
 ```
 
 ## Usage
-The root element should add attribute "c-tpl=objname"
-objname is a object which is watching by Cmay
-when objname changed, the template will rerender as virtual dom and patch it
-{key} is print value from current context
+The root element should add attribute "c-tpl=objname".
+
+objname is a object which is watching by Cmay.
+
+when objname changed, the template will rerender as virtual dom and patch it.
+
+{key} is print value from current context.
 
 eg.
 
