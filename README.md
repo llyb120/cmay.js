@@ -14,6 +14,16 @@ a lightweight javascript dynamic template just like mvvm framwork
   }
 ```
 
+## Build
+
+git clone https://github.com/llyb120/Cmay.js.git
+
+npm install
+
+webpack
+
+
+
 ## Install
 
 ```javascript
