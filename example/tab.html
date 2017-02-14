@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="../dist/dist.js"></script>
+</head>
+
+<body>
+    <script>
+        var data = {
+            current: 0,
+            items: [
+                {
+                    title: 'tab1',
+                    content: "content1"
+                },
+                {
+                    title: 'tab2',
+                    content: "content2"
+                },
+                {
+                    title: 'tab3',
+                    content: "content3"
+                }
+            ]
+        }
+    </script>
+
+<center c-tpl=data >
+    { for item,index in items}
+    <a href="javascript:;" class="" onclick="data.current = {index}">{title}</a> 
+    { end }
+
+    <div>
+        <h2>
+            {items[current].title}
+        </h2>
+        <p>
+            {items[current].content}
+        </p>
+    </div>
+</center>
+</body>
+
+</html>

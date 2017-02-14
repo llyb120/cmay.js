@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="../dist/dist.js"></script>
+</head>
+
+<body>
+    <script>
+        var data = {
+            offset : 0,
+            pics : [
+                'yellow',
+                'pink',
+                'blue'
+            ]
+        }
+
+    </script>
+    <style>
+        .item{
+            float: left;
+            width:500px;
+            height : 300px;
+        }
+        #box{
+            width: 5000px;
+            overflow:hidden;
+            transition: all .5s;
+        }
+    </style>
+
+<script type=text/html c-tpl=data c-tag=center>
+    
+    <div style="width:500px;height:300px;overflow:hidden;"> 
+        <div id=box style="margin-left:{offset}px">
+            {each item in pics}
+            <div class=item style="background:{item}" alt=""></div>
+            {end}
+        </div>  
+    </div>
+</script>
+
+<script>
+    var width = 500;
+
+    setInterval(function(){
+        if(-data.offset >= (data.pics.length - 1) * 500){
+            data.offset = 0;
+        }
+        else{
+            data.offset -= 500;
+        }
+    },1500);
+</script>
+
+
+</body>
+
+</html>

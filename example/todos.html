@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="../dist/dist.js"></script>
+</head>
+
+<body>
+    <script>
+        var data = {
+
+        }
+
+        function add(e){
+            if(e && e.keyCode != 13) {
+                return;
+            }
+            if(data.current == ''){
+                return;
+            }
+            data.unfinished.push({todo:data.current,checked :false});
+            data.current = ''
+        }
+
+        function finished() {
+            var target = data.unfinished.filter(function (item) {
+                return item.checked;
+            });
+            data.unfinished = data.unfinished.filter(function (item) {
+                return !item.checked;
+            });
+            data.finished = data.finished.concat(target);
+        }
+
+        function unfinished(){
+            var target = data.finished.filter(function (item) {
+                return item.checked;
+            });
+            data.finished = data.finished.filter(function (item) {
+                return !item.checked;
+            });
+            data.unfinished = data.unfinished.concat(target);
+        }
+
+        function remove() {
+            data.unfinished = data.unfinished.filter(function (item) {
+                return !item.checked;
+            })
+            data.finished = data.finished.filter(function (item) {
+                return !item.checked;
+            })
+
+        }
+
+        function selectAll(item) {
+            if(data.now == 'all' || data.now == 'unfinished'){
+                for(var i = 0; i < data.unfinished.length; i++) {
+                    data.unfinished[i].checked = item.checked;
+                }
+            }
+            if(data.now == 'all' || data.now == 'finished') {
+                for(var i = 0; i < data.finished.length; i++) {
+                    data.finished[i].checked = item.checked;
+                }
+            }
+
+        }
+    </script>
+
+
+<script type=text/html c-tpl=data c-tag=center c-url="/example/todos.json">
+    <h2>
+        TODO LIST
+    </h2>
+    <p>
+        <input type="text" value="{current}" name="current" onkeyup="add(event)" >
+        <button onclick="add();">ADD</button>
+    </p>
+    <ul>
+        {each item in (now == 'all' ? unfinished.concat(finished) : data[now])}
+            <li>
+                <input type="checkbox" {if checked}checked{end} onclick="{$current}.checked = this.checked" >
+                {item.todo}
+            </li>
+        {end}
+    </ul>
+    <label href="javascript:;" ><input type="checkbox" onclick="selectAll(this)">全选</label>
+    <a href="javascript:;"  onclick="data.now='unfinished'">查看未完成记事</a>
+    <a href="javascript:;"  onclick="data.now='finished'">查看已完成记事</a>
+    <a href="javascript:;"  onclick="data.now='all'">查看所有</a>
+    <div>
+        <HR>
+
+        <a href="javascript:;" onclick="finished()">设为完成</a>
+        <a href="javascript:;" onclick="unfinished()">设为未完成</a>
+        <a href="javascript:;" onclick="remove()">删除</a>
+
+    </div>
+</script>
+
+
+
+
+</body>
+
+</html>

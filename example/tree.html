@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="../dist/dist.js"></script>
+</head>
+
+<body>
+    <script>
+        var tree = [
+            {
+                value: 'top',
+                children: [
+                    {
+                        value: 'cat2_1',
+                        children: [
+                            {
+                                value: 'cat3_1',
+                                children: []
+                            }
+                        ]
+                    },
+                    {
+                        value: 'cat2_2',
+                        children: [
+                            {
+                                value: 'cat3_2',
+                                children: []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+        var test = {abc:1}
+    </script>
+<script type="text/html" c-widget="tree_node" c-tag=ul c-reload='test'>
+        {for item in $data}
+        <li>
+            {value}
+
+            {if children.length }
+            <button  onclick="{$current}.open = !{$current}.open" >
+                {item.open ? '-' : "+"}    
+            </button>
+            {else if 1}
+                <a href="">fuic</a>
+            {end}
+
+            {if( item.open && children.length)}
+                {faker.widget("tree_node",children)}
+            {end}
+        </li>
+        {end}
+</script>
+
+<script type=text/html c-tpl="tree" c-tag=center>
+    {faker.widget("tree_node",$data)}
+</script>
+</body>
+
+</html>
