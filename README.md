@@ -32,6 +32,27 @@ when objname changed, the template will rerender as virtual dom and patch it.
 eg.
 
 ```javascript
+<script>
+    var data = {
+        goods: [
+            {
+                name: 'apple',
+                price: 10
+            },
+            {
+                name: 'banana',
+                price: 20
+            },
+            {
+                name: 'orange',
+                price: 30
+            }
+        ],
+        cart: {}
+    }
+</script>
+
+<script type=text/html c-tpl=data c-tag=center>
 {each item,index in cart}
 <tr>
     <td>{name}</td>
@@ -43,7 +64,15 @@ eg.
     </td>
 </tr>
 { end }
+</script>
+
 ```
+
+also, you can use if/else if/else/for/while 
+
+others are the same as javascript
+
+
 
 ## License
 
