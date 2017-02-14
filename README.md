@@ -2,7 +2,7 @@
 a lightweight javascript dynamic template just like mvvm framwork
 
 
-##Dependencies
+## Dependencies
 
 ```javascript
   "dependencies": {
@@ -12,6 +12,34 @@ a lightweight javascript dynamic template just like mvvm framwork
     "simple-virtual-dom": "^0.1.9",
     "virtual-html": "^2.0.0"
   }
+```
+
+## Install
+
+```javascript
+<script src="../dist/dist.js"></script>
+```
+
+## Usage
+The root element should add attribute "c-tpl=objname"
+objname is a object which is watching by Cmay
+when objname changed, the template will rerender as virtual dom and patch it
+{key} is print value from current context
+
+eg.
+
+```javascript
+{each item,index in cart}
+<tr>
+    <td>{name}</td>
+    <td>{price | money}</td>
+    <td><input name="cart[{index}][count]" type="number" min=1 value={count}></td>
+    <td>{price * count | money}</td>
+    <td>
+        <a href="javascript:;" onclick="delete data.cart.{index}">remove</a>
+    </td>
+</tr>
+{ end }
 ```
 
 ## License
