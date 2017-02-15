@@ -43,11 +43,16 @@ module.exports = {
                 test: /\.jsx?$/,
                 loader: 'babel-loader', // 'babel-loader' is also a legal name to reference
                 query: {
-                    presets: [['es2015', { "modules": false }]],
-                    plugins: ["transform-remove-strict-mode"]
-                    // plugins : [
+                    presets: [['es2015']],
+                    plugins : [
+                        "transform-es3-property-literals",
+                        "transform-es3-member-expression-literals",
+                        "transform-es2015-modules-simple-commonjs",
+                        ['transform-es2015-classes',{loose: true}],
+                        "transform-remove-strict-mode"
+
                     //     ['transform-strict-mode',{"strict": false}]
-                    // ]
+                    ]
                 }
             }
         ]

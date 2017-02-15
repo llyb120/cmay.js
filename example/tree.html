@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
-    <script src="../dist/dist.js"></script>
+    <script src="../dist/cmay.js"></script>
 </head>
 
 <body>
@@ -50,14 +50,14 @@
             {end}
 
             {if( item.open && children.length)}
-                {faker.widget("tree_node",children)}
+                {Cmay.widget("tree_node",children)}
             {end}
         </li>
         {end}
 </script>
 
 <script type=text/html c-tpl="tree" c-tag=center>
-    {faker.widget("tree_node",$data)}
+    {Cmay.widget("tree_node",$data)}
 </script>
 </body>
 
