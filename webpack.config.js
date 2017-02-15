@@ -16,9 +16,9 @@ module.exports = {
         cmay : ['./src/cmay/main.js'],
     },
     output: {
-        path: path.join(__dirname, 'dist'),  //设置打包后的js的输出位置
+        path: path.join(__dirname, ''),  //设置打包后的js的输出位置
         filename: "[name].js",  //和入口文件的名字相同
-        publicPath: "./dist/"  //浏览器会从这个目录开始查找模块
+        publicPath: "./"  //浏览器会从这个目录开始查找模块
     },
     resolve: {
         extensions: ['.js'],
