@@ -16,49 +16,5 @@ require('./filter-default.js');
 
 Cmay.bootstrap();
 
+module.exports = Cmay;
 
-
-
-/*
-var component = require('./component');
-var widget = require("./widget");
-var domready = require('./domready');
-
-var list = [];
-var components = {};
-
-domready(function(){
-    
-    //扫描所有组件
-    var elems = document.querySelectorAll("[c-widget]");
-    for(var i = 0; i < elems.length; i++){
-        var widgetName = elems[i].getAttribute('c-widget');
-        if(widgetName == '' || widgetName == null){
-            continue;
-        }
-        if(components[widgetName]){
-            continue;
-        }
-
-        components[widgetName] = new component(elems[i],widgetName);
-        
-    }
-
-    //扫描所有需要渲染的组件
-    var elems = document.querySelectorAll("[c-tpl]");
-    for(var i = 0; i < elems.length; i++){
-        list.push(new widget(elems[i]));
-    }
-
-    //渲染组件
-    for(var i in components){
-        var elems = document.getElementsByTagName(i);
-        console.log(elems)
-        for(var j = 0; j < elems.length; j++){
-
-        }
-        
-    }
-});
-
-*/
