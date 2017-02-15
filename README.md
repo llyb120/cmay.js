@@ -27,8 +27,17 @@ webpack
 ## Install
 
 ```javascript
+npm install cmay.js
+
+```
+
+
+## In Brower
+
+```javascript
 <script src="../dist/dist.js"></script>
 ```
+
 
 ## Usage
 The root element should add attribute "c-tpl=objname".
