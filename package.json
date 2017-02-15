@@ -16,7 +16,7 @@
     "webpack": "^2.2.1"
   },
   "name": "cmay.js",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "src/cmay/main.js",
   "repository": {
     "type": "git",
