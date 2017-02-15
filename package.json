@@ -4,9 +4,7 @@
     "html-dom-parser": "^0.0.2",
     "locutus": "^2.0.6",
     "simple-virtual-dom": "^0.1.9",
-    "virtual-html": "^2.0.0"
-  },
-  "devDependencies": {
+    "virtual-html": "^2.0.0",
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
     "babel-plugin-transform-es2015-classes": "^6.23.0",
@@ -19,10 +17,13 @@
   },
   "name": "cmay.js",
   "version": "0.0.3",
-  "main": "cmay.js",
+  "main": "src/cmay/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/llyb120/Cmay.js.git"
+    "url": "https://github.com/llyb120/cmay.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/llyb120/cmay.js/issues"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
