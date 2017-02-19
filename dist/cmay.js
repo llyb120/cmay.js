@@ -2832,6 +2832,7 @@ var Cmay = {
 
     bootstrap: function bootstrap() {
         domready(function () {
+          alert(2)
             //扫描所有组件
             var elems = document.querySelectorAll("[c-widget]");
             for (var i = 0; i < elems.length; i++) {
