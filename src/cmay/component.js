@@ -113,13 +113,14 @@ class component {
                     console.log(a)
                 });
 
+                return '\'); try{ buffer.push(' + a + '); }catch(e){} buffer.push(\'';
 
-                try{
-                    return '\'); buffer.push(' + a + ');buffer.push(\'';
-                }
-                catch(e){
-                    return '\'); buffer.push(' + ');buffer.push(\''; 
-                }
+                // try{
+                //     console.error(a)
+                // }
+                // catch(e){
+                //     return '\'); buffer.push(' + ');buffer.push(\'';
+                // }
             }
             /*
             if(/^for\b/.test(a) || ){

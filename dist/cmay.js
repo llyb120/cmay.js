@@ -889,11 +889,14 @@ var component = function () {
                     console.log(a);
                 });
 
-                try {
-                    return '\'); buffer.push(' + a + ');buffer.push(\'';
-                } catch (e) {
-                    return '\'); buffer.push(' + ');buffer.push(\'';
-                }
+                return '\'); try{ buffer.push(' + a + '); }catch(e){} buffer.push(\'';
+
+                // try{
+                //     console.error(a)
+                // }
+                // catch(e){
+                //     return '\'); buffer.push(' + ');buffer.push(\'';
+                // }
             }
             /*
             if(/^for\b/.test(a) || ){
@@ -2832,7 +2835,6 @@ var Cmay = {
 
     bootstrap: function bootstrap() {
         domready(function () {
-          alert(2)
             //扫描所有组件
             var elems = document.querySelectorAll("[c-widget]");
             for (var i = 0; i < elems.length; i++) {
@@ -3074,9 +3076,9 @@ Cmay.filter('date', function (val, args) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var http_build_query = __webpack_require__(49);
+var utils = __webpack_require__(10);
 
 var ajax = function ajax(url, callback) {
-
     var xhr = new XMLHttpRequest();
     xhr.onload = function (e) {
         if (this.readyState == 4 && this.status == 200) {
@@ -3087,19 +3089,48 @@ var ajax = function ajax(url, callback) {
     xhr.send(null);
 };
 
+Cmay.jsonpCallbacks = Cmay.jsonpCallbacks || {};
+
 var reload = function reload(url, widget) {
     var dataKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-    ajax(url, function (txt) {
-        var result = txt;
-        try {
-            result = JSON.parse(result);
-        } catch (e) {
-            result = {};
+    var crossDomain = false;
+    if (!/^https?:/.test(url)) {
+        crossDomain = true;
+    } else if (document.domain.length == 0) {
+        crossDomain = true;
+    } else if (url.indexOf(document.domain) === -1) {
+        crossDomain = true;
+    }
+
+    if (crossDomain) {
+        var funcName = utils.uniqid("cb");
+        Cmay.jsonpCallbacks[funcName] = function (data) {
+            widget.render(data, dataKey);
+        };
+        if (url.indexOf('?') > -1) {
+            url += '&callback=Cmay.jsonpCallbacks.' + funcName;
+        } else {
+            url += '?callback=Cmay.jsonpCallbacks.' + funcName;
         }
-        console.log(result);
-        widget.render(result, dataKey);
-    });
+        var script = document.createElement("script");
+        script.src = url;
+        script.onload = function () {
+            script.parentNode.removeChild(script);
+        };
+        document.head.appendChild(script);
+    } else {
+        ajax(url, function (txt) {
+            var result = txt;
+            try {
+                result = JSON.parse(result);
+            } catch (e) {
+                result = {};
+            }
+            console.log(result);
+            widget.render(result, dataKey);
+        });
+    }
 };
 
 Cmay.plugin({

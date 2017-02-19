@@ -1,7 +1,7 @@
 const http_build_query  = require("locutus/php/url/http_build_query");
+const utils = require('./utils');
 
 var ajax = function(url,callback){
-
 	var xhr = new XMLHttpRequest();
     xhr.onload = function(e){
         if (this.readyState == 4 && this.status == 200) {
@@ -12,18 +12,52 @@ var ajax = function(url,callback){
     xhr.send(null);
 };
 
+Cmay.jsonpCallbacks = Cmay.jsonpCallbacks || {};
+
 var reload = function(url,widget,dataKey = null){
-	ajax(url,function(txt){
-        var result = txt;
-        try{
-            result = JSON.parse(result)
+	var crossDomain = false;
+	if(!/^https?:/.test(url)){
+		crossDomain = true;
+	}
+	else if(document.domain.length == 0){
+		crossDomain = true;
+	}
+	else if(url.indexOf(document.domain) === -1){
+		crossDomain = true;
+	}
+
+	if(crossDomain){
+		var funcName = utils.uniqid("cb");
+        Cmay.jsonpCallbacks[funcName] = function(data){
+        	widget.render(data,dataKey);
+		};
+		if(url.indexOf('?') > -1){
+			url += '&callback=Cmay.jsonpCallbacks.' + funcName;
+		}
+		else{
+			url += '?callback=Cmay.jsonpCallbacks.' + funcName;
+		}
+		var script = document.createElement("script");
+		script.src = url;
+		script.onload = function () {
+			script.parentNode.removeChild(script);
         }
-        catch(e){
-        	result = {};
-        }
-        console.log(result)
-        widget.render(result,dataKey);
-	});
+        document.head.appendChild(script);
+	}
+	else{
+        ajax(url,function(txt){
+            var result = txt;
+            try{
+                result = JSON.parse(result)
+            }
+            catch(e){
+                result = {};
+            }
+            console.log(result)
+            widget.render(result,dataKey);
+        });
+	}
+
 }
 
 
@@ -41,6 +75,7 @@ Cmay.plugin({
 
         console.log(widget);
     },
+
 
 
     'c-reload' : function(val,data,dom,widget){
