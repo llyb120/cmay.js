@@ -68,104 +68,6 @@ class component {
         filterInfoRegex = new RegExp(filterInfoRegex);
 
         var code2;
-        // var components = Cmay.getComponents();
-        // // var regbuf = [];
-        // // for(var name in components){
-        // //     regbuf.push(`<(${name})[\\s\\S]*?(\/?)>`);
-        // //     regbuf.push(`<(\/)(${name})`);
-        // // }
-        // var getHTML = (node,outer = true) => {
-        //     if(node.type == 'tag'){
-        //         var ret = '';
-        //         if(outer){
-        //             ret += `<${node.name}`
-        //             for(var i in node.attribs){
-        //                 ret += ` ${i}="${node.attribs[i]}"`;
-        //             }
-        //         }
-        //
-        //         if(node.children.length){
-        //             if(outer){
-        //                 ret += ' >';
-        //             }
-        //             node.children.forEach((child) => {
-        //                 ret += getHTML(child);
-        //             });
-        //             if(outer){
-        //                 ret += `</${node.name}>`;
-        //             }
-        //         }
-        //         else{
-        //             ret += ' />';
-        //         }
-        //         return ret;
-        //     }
-        //     else{
-        //         return node.data;
-        //     }
-        // };
-        //
-        // var dom = Parser(this.$tpl);
-        // console.error((dom));
-        //
-        // console.error(getHTML(dom[0],false));
-        //
-        // var flag = true;
-        // var walk = (node,index) => {
-        //     if(node.type != 'tag'){
-        //         return;
-        //     }
-        //
-        //     if(components[node.name]){
-        //         node.parent.children[index] = {
-        //             type : 'text',
-        //             data : `{Cmay.widget("${node.name}",${node.attribs["c-data"]},${flag ? "'" : "\\\'"}${getHTML(node,false)}${flag ? "'" : "\\\'"})}`
-        //         }
-        //         flag = false;
-        //     }
-        //     node.children.forEach((child,_index) => {
-        //         walk(child,_index);
-        //     });
-        // }
-        // walk(dom[0]);
-        //
-        // this.$tpl = getHTML(dom[0])
-        //
-        // console.error(dom)
-        // var stack = [dom];
-        // while(stack.length){
-        //     let node = stack.shift();
-        //
-        // }
-        // console.log(dom)
-        // if(regbuf.length){
-        //     var fullRegexp = new RegExp(`${regbuf.join('|')}`,"g");
-        //     var r = null;
-        //     var limit = 998;
-        //     var stack = [];
-        //     while(r = fullRegexp.exec(this.$tpl)){
-        //         console.error(r)
-        //         if(--limit == 0){
-        //             console.error("you write wrong code!!!");
-        //             break;
-        //         }
-        //         //tag start
-        //         if(r[1]){
-        //             stack.push([r[1],r.index]);
-        //         }
-        //         //tag end
-        //         else if(r[3]){
-        //             var top = stack.pop();
-        //
-        //         }
-        //     }
-        //     var matched = this.$tpl.match(fullRegexp);
-        //     console.warn(matched)
-        //     code2 = this.$tpl.replace(fullRegexp,function (matched,a) {
-        //         console.error(matched)
-        //     })
-        // }
-
 
         code2 = this.$tpl.replace(/\{([\s\S]+?)\}|[^\{]+/g, function (matched, a) {
             if (!a) {
@@ -274,17 +176,6 @@ class component {
                 //     return '\'); buffer.push(' + ');buffer.push(\'';
                 // }
             }
-            /*
-            if(/^for\b/.test(a) || ){
-
-            }
-            if (a.indexOf('for') > -1 || a.indexOf('}') > -1) {
-                return '\');' + a + " buffer.push(\'";
-            }
-            else {
-                
-            }
-            */
         });
 
         var finalCode = code + code2 + '\'); } var ret = buffer.join(""); ret = ret.replace(/^(<[^\\s>]+)/,"$1 data-uuid=" + uuid); console.log(ret); return ret; });';

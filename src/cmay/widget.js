@@ -96,7 +96,6 @@ class widget {
                 var html = this.$prototype.$factory(this.$proxy, this.$uuid);
                 //build virtual dom
                 var vdom = this.convertVirtualDom(html);
-                console.error(vdom)
             }
 
             //
