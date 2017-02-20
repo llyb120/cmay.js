@@ -89,9 +89,16 @@ class widget {
             this.$timer = null;
         }
         this.$timer = setTimeout(() => {
-            var html = this.$prototype.$factory(this.$proxy, this.$uuid);
-            //build virtual dom
-            var vdom = this.convertVirtualDom(html);
+            if(config.renderType == 'node'){
+                this.$prototype.render(this.$proxy);
+            }
+            else{
+                var html = this.$prototype.$factory(this.$proxy, this.$uuid);
+                //build virtual dom
+                var vdom = this.convertVirtualDom(html);
+                console.error(vdom)
+            }
+
             //
             if (this.$vdom) {
                 //二次渲染的时候，移除没用的内容

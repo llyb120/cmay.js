@@ -2,25 +2,57 @@ var utils = require('./utils');
 
 const htmlspecialchars_decode = require('locutus/php/strings/htmlspecialchars_decode');
 // const addslashes = require('locutus/php/strings/addslashes');
-// const Parser = require('html-dom-parser');
+const Parser = require('html-dom-parser');
+const config = require('./config.js');
 
 class component {
     constructor(domNode,cleanDom = true) {
-        this.$tpl = domNode.outerHTML.replace(/[\r\n]/g, "");
-        this.$rootTag = domNode.getAttribute('f-tag') || 'div';
-        this.$tpl = this.$tpl
-                        .replace(/^<script/gi,"<"+this.$rootTag)
-            .replace(/<\/script>/gi, "</" + this.$rootTag + '>')
-        ;
-        this.initFactory();
+        if(config.renderType == 'node'){
+            /**
+             * 另一种渲染方式
+             */
+            var dom = Parser(this.$tpl);
+            dom[0].name = dom[0].attribs['f-tag'] || 'div';
+            this.$dom = dom[0];
+            // this.initNodeFactory();
+        }
+        else{
+            this.$tpl = domNode.outerHTML.replace(/[\r\n]/g, "");
+            this.$rootTag = domNode.getAttribute('f-tag') || 'div';
+            this.$tpl = this.$tpl
+                .replace(/^<script/gi,"<"+this.$rootTag)
+                .replace(/<\/script>/gi, "</" + this.$rootTag + '>')
+            ;
+            this.initStringFactory();
+        }
+
 
         if(cleanDom){
             domNode.parentNode.removeChild(domNode);
         }
     };
 
+    render($data,$uuid = null){
+        if(!$uuid){
+            $uuid = Cmay.set($data);
+        }
+        this.$dom.attribs['data-uuid'] = $uuid;
+        var stack = [this.$dom];
+        while(stack.length){
+            var node = stack.shift();
+            if(node.type == 'tag'){
+                for(var i = 0; i < node.children.length; i++){
 
-    initFactory() {
+                }
+            }
+            else{
+
+            }
+
+        }
+    }
+
+    initStringFactory() {
         var keywords = ['if', 'for', 'else if','else'].map(function (item) {
             return '^\\s*(' + item + ')';
         });
@@ -154,7 +186,10 @@ class component {
                     return '\');' + `} } _uuid = $last.pop(); $current = "Cmay.get(\\'"+_uuid+"\\')";` + " buffer.push(\'";
                 }
                 else{
-                    return '\');' + '}' + " buffer.push(\'";
+                    return `');
+                        }
+                        buffer.push('`;
+                    //return '\');' + '}' + " buffer.push(\'";
                 }
             }
             else if (_matched = a.match(/(?:for|each)\s*(\w+)?(?:,\s*(\w+))?\s*in\s*([^\}\{]+)/)) {
@@ -187,12 +222,22 @@ class component {
                     case 'for':
                     case 'if':
                         count++;
-                        return '\'); '+_matched[0]+'(' + a.replace(regexp,"") + "){ buffer.push(\'";
+                        return `'); 
+                            ${_matched[0]} (${a.replace(regexp,"")}) {
+                                buffer.push('`;
+                        //return '\'); '+_matched[0]+'(' + a.replace(regexp,"") + "){ buffer.push(\'";
                     case 'else':
-                        return '\'); }' + a + "{ buffer.push(\'";
+                        return `');
+                            }
+                            ${a}{
+                                buffer.push('`;
+                        // return '\'); }' + a + "{ buffer.push(\'";
 
                     case 'else if':
-                        return '\'); }else if(' + a.replace(regexp,"") + "){ buffer.push(\'";
+                        return `');
+                                }else if(${a.replace(regexp,"")}){
+                                    buffer.push('`;
+                        //return '\'); }else if(' + a.replace(regexp,"") + "){ buffer.push(\'";
 
                     
 
@@ -212,10 +257,15 @@ class component {
 
                 filters.forEach(function(filter){
                     a = `Cmay.getFilter('${filter[0]}').call(null,${a},'${filter[1]}')`;
-                    console.log(a)
                 });
 
-                return '\'); try{ buffer.push(' + a + '); }catch(e){} buffer.push(\'';
+                return `');
+                    try{
+                        buffer.push(${a})
+                    }catch(e){
+                    }
+                    buffer.push('`;
+                //return '\'); try{ buffer.push(' + a + '); }catch(e){} buffer.push(\'';
 
                 // try{
                 //     console.error(a)
