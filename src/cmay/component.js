@@ -1,6 +1,8 @@
 var utils = require('./utils');
 
 const htmlspecialchars_decode = require('locutus/php/strings/htmlspecialchars_decode');
+const addslashes = require('locutus/php/strings/addslashes');
+const Parser = require('html-dom-parser');
 
 class component {
     constructor(domNode,cleanDom = true) {
@@ -8,7 +10,8 @@ class component {
         this.$rootTag = domNode.getAttribute('f-tag') || 'div';
         this.$tpl = this.$tpl
                         .replace(/^<script/gi,"<"+this.$rootTag)
-                        .replace(/<\/script>/gi,"</" + this.$rootTag + '>');
+            .replace(/<\/script>/gi, "</" + this.$rootTag + '>')
+        ;
         this.initFactory();
 
         if(cleanDom){
@@ -30,10 +33,109 @@ class component {
         var charRegex = "[^\\s\\n\\r\\t\\|]";
         var filterInfoRegex = `${spaceRegex}(${charRegex}+)${spaceRegex}([^\\|]*)`;
         var filterRegex = new RegExp(`\\|${filterInfoRegex}`,'g');
-        filterInfoRegex = new RegExp(filterInfoRegex)
+        filterInfoRegex = new RegExp(filterInfoRegex);
 
-        var code2 = this.$tpl.replace(/\{([\s\S]+?)\}|[^\{]+/g, function (matched, a) {
+        var code2;
+        // var components = Cmay.getComponents();
+        // // var regbuf = [];
+        // // for(var name in components){
+        // //     regbuf.push(`<(${name})[\\s\\S]*?(\/?)>`);
+        // //     regbuf.push(`<(\/)(${name})`);
+        // // }
+        // var getHTML = (node,outer = true) => {
+        //     if(node.type == 'tag'){
+        //         var ret = '';
+        //         if(outer){
+        //             ret += `<${node.name}`
+        //             for(var i in node.attribs){
+        //                 ret += ` ${i}="${node.attribs[i]}"`;
+        //             }
+        //         }
+        //
+        //         if(node.children.length){
+        //             if(outer){
+        //                 ret += ' >';
+        //             }
+        //             node.children.forEach((child) => {
+        //                 ret += getHTML(child);
+        //             });
+        //             if(outer){
+        //                 ret += `</${node.name}>`;
+        //             }
+        //         }
+        //         else{
+        //             ret += ' />';
+        //         }
+        //         return ret;
+        //     }
+        //     else{
+        //         return node.data;
+        //     }
+        // };
+        //
+        // var dom = Parser(this.$tpl);
+        // console.error((dom));
+        //
+        // console.error(getHTML(dom[0],false));
+        //
+        // var flag = true;
+        // var walk = (node,index) => {
+        //     if(node.type != 'tag'){
+        //         return;
+        //     }
+        //
+        //     if(components[node.name]){
+        //         node.parent.children[index] = {
+        //             type : 'text',
+        //             data : `{Cmay.widget("${node.name}",${node.attribs["c-data"]},${flag ? "'" : "\\\'"}${getHTML(node,false)}${flag ? "'" : "\\\'"})}`
+        //         }
+        //         flag = false;
+        //     }
+        //     node.children.forEach((child,_index) => {
+        //         walk(child,_index);
+        //     });
+        // }
+        // walk(dom[0]);
+        //
+        // this.$tpl = getHTML(dom[0])
+        //
+        // console.error(dom)
+        // var stack = [dom];
+        // while(stack.length){
+        //     let node = stack.shift();
+        //
+        // }
+        // console.log(dom)
+        // if(regbuf.length){
+        //     var fullRegexp = new RegExp(`${regbuf.join('|')}`,"g");
+        //     var r = null;
+        //     var limit = 998;
+        //     var stack = [];
+        //     while(r = fullRegexp.exec(this.$tpl)){
+        //         console.error(r)
+        //         if(--limit == 0){
+        //             console.error("you write wrong code!!!");
+        //             break;
+        //         }
+        //         //tag start
+        //         if(r[1]){
+        //             stack.push([r[1],r.index]);
+        //         }
+        //         //tag end
+        //         else if(r[3]){
+        //             var top = stack.pop();
+        //
+        //         }
+        //     }
+        //     var matched = this.$tpl.match(fullRegexp);
+        //     console.warn(matched)
+        //     code2 = this.$tpl.replace(fullRegexp,function (matched,a) {
+        //         console.error(matched)
+        //     })
+        // }
 
+
+        code2 = this.$tpl.replace(/\{([\s\S]+?)\}|[^\{]+/g, function (matched, a) {
             if (!a) {
                 return matched
                     .replace(/[\\"']/g, '\\$&')

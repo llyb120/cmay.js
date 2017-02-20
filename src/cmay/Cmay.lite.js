@@ -28,6 +28,7 @@ var Cmay = {
     },
 
     widget: function (componentName, data = {}) {
+        console.warn(arguments)
         if (!components[componentName]) {
             return '';
         }
