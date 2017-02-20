@@ -1,8 +1,8 @@
 var utils = require('./utils');
 
 const htmlspecialchars_decode = require('locutus/php/strings/htmlspecialchars_decode');
-const addslashes = require('locutus/php/strings/addslashes');
-const Parser = require('html-dom-parser');
+// const addslashes = require('locutus/php/strings/addslashes');
+// const Parser = require('html-dom-parser');
 
 class component {
     constructor(domNode,cleanDom = true) {
