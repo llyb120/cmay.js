@@ -19,7 +19,12 @@ var Cmay = {
         if (components[widgetName]) {
             return;
         }
+        components[widgetName] = 1;
         components[widgetName] = new component(domNode);
+    },
+
+    getComponents(){
+        return components;
     },
 
     widget: function (componentName, data = {}) {
