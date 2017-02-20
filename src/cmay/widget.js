@@ -90,7 +90,7 @@ class widget {
         }
         this.$timer = setTimeout(() => {
             if(config.renderType == 'node'){
-                this.$prototype.render(this.$proxy);
+                var dom = this.$prototype.render(this.$proxy);
             }
             else{
                 var html = this.$prototype.$factory(this.$proxy, this.$uuid);

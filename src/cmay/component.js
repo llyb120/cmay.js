@@ -33,6 +33,7 @@ class component {
     };
 
     render($data,$uuid = null){
+        var reg = /\{([\s\S]+?)\}/g;
         if(!$uuid){
             $uuid = Cmay.set($data);
         }
@@ -42,10 +43,18 @@ class component {
             var node = stack.shift();
             if(node.type == 'tag'){
                 for(var i = 0; i < node.children.length; i++){
-
+                    stack.push(node.children[i]);
                 }
             }
             else{
+                node.data = node.data.replace(reg,function(matched,a){
+
+                });
+
+                // var matched = node.data.match(reg);
+                // if(!matched){
+                //     return;
+                // }
 
             }
 
