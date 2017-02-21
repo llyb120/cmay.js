@@ -10,6 +10,7 @@ const diff = svd.diff
 const patch = svd.patch
 
 var Parser = require('html-dom-parser');
+var h2v = require('./h2v');
 
 
 class widget {
@@ -94,8 +95,10 @@ class widget {
             }
             else{
                 var html = this.$prototype.$factory(this.$proxy, this.$uuid);
-                //build virtual dom
-                var vdom = this.convertVirtualDom(html);
+                var vdom = h2v(html);
+                // console.error(vdom)
+                // //build virtual dom
+                // var vdom = this.convertVirtualDom(html);
             }
 
             //
@@ -139,32 +142,32 @@ class widget {
 
     };
 
-    convertVirtualDom(html) {
-        var dom = Parser(html);
-        if (!dom.length) {
-            return [{ name: "div", attribs: {}, children: [] }]
-        }
-        var node = dom[0];
-        return el(node.name, node.attribs, this.generateVirtualDomNode(node.children));
-    };
-
-    generateVirtualDomNode(nodes) {
-        var ret = [];
-        for (var i = 0; i < nodes.length; i++) {
-            var node = nodes[i];
-            if (node.type == 'tag') {
-                //修正input显示“”的问题
-                // if (node.tagName === 'input' && node.attribs.value == '""') {
-                //     node.attribs.value = "";
-                // }
-                ret.push(el(node.name, node.attribs, this.generateVirtualDomNode(node.children)));
-            }
-            else if (node.type == 'text') {
-                ret.push(node.data);
-            }
-        }
-        return ret;
-    };
+    // convertVirtualDom(html) {
+    //     var dom = Parser(html);
+    //     if (!dom.length) {
+    //         return [{ name: "div", attribs: {}, children: [] }]
+    //     }
+    //     var node = dom[0];
+    //     return el(node.name, node.attribs, this.generateVirtualDomNode(node.children));
+    // };
+    //
+    // generateVirtualDomNode(nodes) {
+    //     var ret = [];
+    //     for (var i = 0; i < nodes.length; i++) {
+    //         var node = nodes[i];
+    //         if (node.type == 'tag') {
+    //             //修正input显示“”的问题
+    //             // if (node.tagName === 'input' && node.attribs.value == '""') {
+    //             //     node.attribs.value = "";
+    //             // }
+    //             ret.push(el(node.name, node.attribs, this.generateVirtualDomNode(node.children)));
+    //         }
+    //         else if (node.type == 'text') {
+    //             ret.push(node.data);
+    //         }
+    //     }
+    //     return ret;
+    // };
 }
 
 module.exports = widget;

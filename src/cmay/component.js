@@ -32,8 +32,19 @@ class component {
         }
     };
 
-    render($data,$uuid = null){
+    renderNode(str){
         var reg = /\{([\s\S]+?)\}/g;
+        return str.replace(reg,function(matched,a){
+
+        });
+    };
+
+    render($data,$uuid = null){
+        var keywords = ['if', 'for', 'else if','else'].map(function (item) {
+            return '^\\s*(' + item + ')';
+        });
+        var keyWordsRegexp = new RegExp(keywords.join("|"));
+        var endRegExp = /\{\s*end\s*\}/;
         if(!$uuid){
             $uuid = Cmay.set($data);
         }
@@ -47,9 +58,21 @@ class component {
                 }
             }
             else{
-                node.data = node.data.replace(reg,function(matched,a){
-
+                var params = [];
+                node.data = node.data.replace(keyWordsRegexp,function(matched,keyword){
+                    switch (keyword.trim()){
+                        case 'for':
+                            var item = node;
+                            while(item = node.next){
+                                params.push(node)
+                            }
+                            break;
+                    }
                 });
+                // node.data = this.render(node)
+                // node.data = node.data.replace(reg,function(matched,a){
+                //
+                // });
 
                 // var matched = node.data.match(reg);
                 // if(!matched){
