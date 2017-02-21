@@ -1,5 +1,7 @@
 /**
- * https://github.com/livoras/h2v/blob/master/index.js
+ * @author livoras
+ * @licence MIT
+ * @forked https://github.com/livoras/h2v/blob/master/index.js
  */
 var svd = require('simple-virtual-dom')
 var el = svd.el
@@ -96,25 +98,87 @@ function parseDOM(html) {
 //     return toVirtualDOM(root)
 // }
 
-function toVirtualDOM (dom) {
-    var tagName = dom.tagName.toLowerCase()
-    var props = attrsToObj(dom)
-    var children = []
-    for (var i = 0, len = dom.childNodes.length; i < len; i++) {
-        var node = dom.childNodes[i]
-        // TEXT node
-        if (node.nodeType === 3) {
-            if (node.nodeValue) {
-                children.push(node.nodeValue)
-            } else {
-                children.push(node.textContent)
+const regexp = /\{[\s\S]+?\}/g;
+const config = require('./config');
+
+if(config.renderType == 'node'){
+    var toVirtualDOM = function(dom) {
+        var tagName = dom.tagName.toLowerCase()
+        var props = attrsToObj(dom)
+        var children = []
+        for (var i = 0, len = dom.childNodes.length; i < len; i++) {
+            var node = dom.childNodes[i]
+            // TEXT node
+            if (node.nodeType === 3) {
+                var val;
+                if (node.nodeValue) {
+                    val = (node.nodeValue)
+                } else {
+                    val = (node.textContent)
+                }
+                if(config.renderType == 'node'){
+                    var splited = val.split(regexp)
+                    if(splited.length > 1){
+                        var matched = val.match(regexp);
+                        splited.forEach((item,index) => {
+                            children.push(item);
+                            if(matched[index]){
+                                children.push(matched[index]);
+                            }
+                        })
+                    }
+                    else{
+                        children.push(val);
+                    }
+                }
+                else{
+                    children.push(val)
+                }
+
             }
-        } else {
-            children.push(toVirtualDOM(node))
+            else if(node.nodeType == 8){
+                var val = node.nodeValue.trim();
+                if(val == 'end'){
+                    children.push('?!' + node.nodeValue)
+                }
+                else{
+                    children.push('??' + node.nodeValue)
+                }
+            }
+            else {
+                children.push(toVirtualDOM(node))
+            }
         }
+        var ret = el(tagName, props, children)
+        return ret;
     }
-    return el(tagName, props, children)
 }
+else{
+     var toVirtualDOM = function(dom) {
+        var tagName = dom.tagName.toLowerCase()
+        var props = attrsToObj(dom)
+        var children = []
+        for (var i = 0, len = dom.childNodes.length; i < len; i++) {
+            var node = dom.childNodes[i]
+            // TEXT node
+            if (node.nodeType === 3) {
+                var val;
+                if (node.nodeValue) {
+                    val = (node.nodeValue)
+                } else {
+                    val = (node.textContent)
+                }
+                children.push(val);
+            }
+            else {
+                children.push(toVirtualDOM(node))
+            }
+        }
+        var ret = el(tagName, props, children)
+        return ret;
+    }
+}
+
 
 function attrsToObj (dom) {
     var attrs = dom.attributes

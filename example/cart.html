@@ -51,8 +51,8 @@
 
 <script type=text/html c-tpl=data c-tag=center>
 
-    <ul>
-        {each in data.goods}
+    <ul test="{abc}">
+        {each in data.goods} {name}
         <li>
             name : {name} ,
             price : {price | money}

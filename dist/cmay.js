@@ -405,7 +405,7 @@ module.exports = function (key) {
 
 module.exports = {
     fps: 60,
-    renderType: 'string'
+    renderType: 'node'
 };
 
 /***/ }),
@@ -903,14 +903,16 @@ module.exports = function (it, S) {
 /* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var utils = __webpack_require__(5);
 
 var htmlspecialchars_decode = __webpack_require__(48);
 // const addslashes = require('locutus/php/strings/addslashes');
-var Parser = __webpack_require__(20);
 var config = __webpack_require__(19);
+var h2v = __webpack_require__(92);
 
 var component = function () {
     function component(domNode) {
@@ -918,18 +920,22 @@ var component = function () {
 
         _classCallCheck(this, component);
 
+        this.$rootTag = domNode.getAttribute('f-tag') || 'div';
+        this.$tpl = domNode.outerHTML.replace(/[\r\n]/g, "").replace(/^<script/gi, "<" + this.$rootTag).replace(/<\/script>/gi, "</" + this.$rootTag + '>');
+
         if (config.renderType == 'node') {
+            this.$tpl = this.$tpl.replace(/\{([\s\S]+?)\}/g, "<!-- $1 -->");
+
             /**
              * 另一种渲染方式
              */
-            var dom = Parser(this.$tpl);
-            dom[0].name = dom[0].attribs['f-tag'] || 'div';
-            this.$dom = dom[0];
+            var dom = h2v(this.$tpl);
+            console.warn(dom);
+            // dom[0].name = dom[0].props['f-tag'] || 'div';
+            this.$dom = dom;
+
             // this.initNodeFactory();
         } else {
-            this.$tpl = domNode.outerHTML.replace(/[\r\n]/g, "");
-            this.$rootTag = domNode.getAttribute('f-tag') || 'div';
-            this.$tpl = this.$tpl.replace(/^<script/gi, "<" + this.$rootTag).replace(/<\/script>/gi, "</" + this.$rootTag + '>');
             this.initStringFactory();
         }
 
@@ -943,9 +949,32 @@ var component = function () {
         return str.replace(reg, function (matched, a) {});
     };
 
+    component.prototype.walkNode = function walkNode(node, parentNode) {
+        if ((typeof node === 'undefined' ? 'undefined' : _typeof(node)) == 'object') {
+            for (var i = 0; i < node.children.length; i++) {
+                this.walkNode(node.children[i], parentNode);
+            }
+        } else {}
+    };
+
     component.prototype.render = function render($data) {
         var $uuid = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
+        var keywords = ['if', 'for', 'else if', 'else'].map(function (item) {
+            return '^\\s*(' + item + ')';
+        });
+        var keyWordsRegexp = new RegExp(keywords.join("|"));
+        var cpy = JSON.parse(JSON.stringify(this.$dom));
+        this.walkNode(cpy);
+        // var stack = [this.$dom];
+        // while (stack.length) {
+        //     var node = stack.shift();
+        //
+        // }
+        console.log(cpy);
+        return cpy;
+        console.log(cpy);
+        return;
         var keywords = ['if', 'for', 'else if', 'else'].map(function (item) {
             return '^\\s*(' + item + ')';
         });
@@ -954,7 +983,8 @@ var component = function () {
         if (!$uuid) {
             $uuid = Cmay.set($data);
         }
-        this.$dom.attribs['data-uuid'] = $uuid;
+        console.log(this);
+        this.$dom.props['data-uuid'] = $uuid;
         var stack = [this.$dom];
         while (stack.length) {
             var node = stack.shift();
@@ -3142,7 +3172,9 @@ Cmay.filter('date', function (val, args) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
- * https://github.com/livoras/h2v/blob/master/index.js
+ * @author livoras
+ * @licence MIT
+ * @forked https://github.com/livoras/h2v/blob/master/index.js
  */
 var svd = __webpack_require__(21);
 var el = svd.el;
@@ -3228,24 +3260,77 @@ function parseDOM(html) {
 //     return toVirtualDOM(root)
 // }
 
-function toVirtualDOM(dom) {
-    var tagName = dom.tagName.toLowerCase();
-    var props = attrsToObj(dom);
-    var children = [];
-    for (var i = 0, len = dom.childNodes.length; i < len; i++) {
-        var node = dom.childNodes[i];
-        // TEXT node
-        if (node.nodeType === 3) {
-            if (node.nodeValue) {
-                children.push(node.nodeValue);
+var regexp = /\{[\s\S]+?\}/g;
+var config = __webpack_require__(19);
+
+if (config.renderType == 'node') {
+    var toVirtualDOM = function toVirtualDOM(dom) {
+        var tagName = dom.tagName.toLowerCase();
+        var props = attrsToObj(dom);
+        var children = [];
+        for (var i = 0, len = dom.childNodes.length; i < len; i++) {
+            var node = dom.childNodes[i];
+            // TEXT node
+            if (node.nodeType === 3) {
+                var val;
+                if (node.nodeValue) {
+                    val = node.nodeValue;
+                } else {
+                    val = node.textContent;
+                }
+                if (config.renderType == 'node') {
+                    var splited = val.split(regexp);
+                    if (splited.length > 1) {
+                        var matched = val.match(regexp);
+                        splited.forEach(function (item, index) {
+                            children.push(item);
+                            if (matched[index]) {
+                                children.push(matched[index]);
+                            }
+                        });
+                    } else {
+                        children.push(val);
+                    }
+                } else {
+                    children.push(val);
+                }
+            } else if (node.nodeType == 8) {
+                var val = node.nodeValue.trim();
+                if (val == 'end') {
+                    children.push('?!' + node.nodeValue);
+                } else {
+                    children.push('??' + node.nodeValue);
+                }
             } else {
-                children.push(node.textContent);
+                children.push(toVirtualDOM(node));
             }
-        } else {
-            children.push(toVirtualDOM(node));
         }
-    }
-    return el(tagName, props, children);
+        var ret = el(tagName, props, children);
+        return ret;
+    };
+} else {
+    var toVirtualDOM = function toVirtualDOM(dom) {
+        var tagName = dom.tagName.toLowerCase();
+        var props = attrsToObj(dom);
+        var children = [];
+        for (var i = 0, len = dom.childNodes.length; i < len; i++) {
+            var node = dom.childNodes[i];
+            // TEXT node
+            if (node.nodeType === 3) {
+                var val;
+                if (node.nodeValue) {
+                    val = node.nodeValue;
+                } else {
+                    val = node.textContent;
+                }
+                children.push(val);
+            } else {
+                children.push(toVirtualDOM(node));
+            }
+        }
+        var ret = el(tagName, props, children);
+        return ret;
+    };
 }
 
 function attrsToObj(dom) {
@@ -3376,6 +3461,8 @@ Cmay.plugin({
 /* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var proxy = __webpack_require__(40);
@@ -3388,6 +3475,44 @@ var component = __webpack_require__(39);
 var el = svd.el;
 var diff = svd.diff;
 var patch = svd.patch;
+
+var setAttr = function setAttr(node, key, value) {
+    switch (key) {
+        case 'style':
+            node.style.cssText = value;
+            break;
+        case 'value':
+            var tagName = node.tagName || '';
+            tagName = tagName.toLowerCase();
+            if (tagName === 'input' || tagName === 'textarea') {
+                node.value = value;
+            } else {
+                // if it is not a input or textarea, use `setAttribute` to set
+                node.setAttribute(key, value);
+            }
+            break;
+        default:
+            node.setAttribute(key, value);
+            break;
+    }
+};
+
+el.prototype.render = function () {
+    var ele = document.createElement(this.tagName);
+    var props = this.props;
+
+    for (var propName in props) {
+        var propValue = props[propName];
+        setAttr(ele, propName, propValue);
+    }
+
+    this.children.forEach(function (child) {
+        var childEl = (typeof child === 'undefined' ? 'undefined' : _typeof(child)) == 'object' ? el.prototype.render.call(child) : document.createTextNode(child);
+        ele.appendChild(childEl);
+    });
+
+    return ele;
+};
 
 var Parser = __webpack_require__(20);
 var h2v = __webpack_require__(92);
@@ -3469,7 +3594,7 @@ var widget = function () {
         }
         this.$timer = setTimeout(function () {
             if (config.renderType == 'node') {
-                var dom = _this.$prototype.render(_this.$proxy);
+                var vdom = _this.$prototype.render(_this.$proxy);
             } else {
                 var html = _this.$prototype.$factory(_this.$proxy, _this.$uuid);
                 var vdom = h2v(html);
@@ -3489,7 +3614,8 @@ var widget = function () {
                 var patches = diff(_this.$vdom, vdom);
                 patch(_this.$element, patches);
             } else {
-                var realDom = vdom.render();
+                // var realDom = vdom.render();
+                var realDom = el.prototype.render.call(vdom);
                 _this.$element.parentNode.replaceChild(realDom, _this.$element);
                 _this.$element = realDom;
             }

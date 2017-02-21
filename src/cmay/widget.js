@@ -9,6 +9,51 @@ const el = svd.el;
 const diff = svd.diff
 const patch = svd.patch
 
+
+const setAttr = function (node, key, value) {
+    switch (key) {
+        case 'style':
+            node.style.cssText = value
+            break
+        case 'value':
+            var tagName = node.tagName || ''
+            tagName = tagName.toLowerCase()
+            if (
+                tagName === 'input' || tagName === 'textarea'
+            ) {
+                node.value = value
+            } else {
+                // if it is not a input or textarea, use `setAttribute` to set
+                node.setAttribute(key, value)
+            }
+            break
+        default:
+            node.setAttribute(key, value)
+            break
+    }
+}
+
+
+el.prototype.render = function () {
+    var ele = document.createElement(this.tagName)
+    var props = this.props
+
+    for (var propName in props) {
+        var propValue = props[propName]
+        setAttr(ele, propName, propValue)
+    }
+
+    this.children.forEach(function (child) {
+        var childEl = (typeof child == 'object')
+            ? el.prototype.render.call(child)
+            : document.createTextNode(child)
+        ele.appendChild(childEl)
+    })
+
+    return ele
+}
+
+
 var Parser = require('html-dom-parser');
 var h2v = require('./h2v');
 
@@ -20,7 +65,7 @@ class widget {
         var data = null;
         var _data = domNode.getAttribute('c-tpl').trim();
         domNode.removeAttribute('c-tpl');
-        
+
         if (_component == null) {
             this.$prototype = new component(domNode, false);
         }
@@ -29,16 +74,16 @@ class widget {
         }
 
         //this.$tpl = domNode.outerHTML.replace(/[\r\n]/g, "");
-        
+
         //如果没有声明被绑定的对象，视为一般的模板，不再响应双向绑定
         if (_data == '') {
             this.$proxy = proxy.proxyFactory({}, this);
         }
-        else if(_data.length && _data[0] == '{' || _data[0] == '['){
-            try{
+        else if (_data.length && _data[0] == '{' || _data[0] == '[') {
+            try {
                 this.$proxy = proxy.proxyFactory(JSON.parse(_data), this);
             }
-            catch(e){
+            catch (e) {
                 this.$proxy = proxy.proxyFactory({}, this);
             }
         }
@@ -54,12 +99,12 @@ class widget {
 
         var plugins = Cmay.plugins();
         var self = this;
-        plugins.forEach(function(item){
-            for(var attrName in item){
+        plugins.forEach(function (item) {
+            for (var attrName in item) {
                 var callback = item[attrName];
                 var val = domNode.getAttribute(attrName);
-                if(val){
-                    callback.call(null,val,self.$proxy,domNode,self);
+                if (val) {
+                    callback.call(null, val, self.$proxy, domNode, self);
                 }
             }
         })
@@ -71,18 +116,18 @@ class widget {
     };
 
 
-    render(data = null,dataKey = null) {
-        if(data){
-            if(dataKey){
+    render(data = null, dataKey = null) {
+        if (data) {
+            if (dataKey) {
                 console.log('this.$proxy.' + dataKey + '=' + JSON.stringify(data))
                 eval('this.$proxy.' + dataKey + '=' + JSON.stringify(data));
             }
-            else{
-                for(var i in data){
+            else {
+                for (var i in data) {
                     this.$proxy[i] = data[i];
                 }
             }
-            
+
         }
 
         if (this.$timer) {
@@ -90,10 +135,10 @@ class widget {
             this.$timer = null;
         }
         this.$timer = setTimeout(() => {
-            if(config.renderType == 'node'){
-                var dom = this.$prototype.render(this.$proxy);
+            if (config.renderType == 'node') {
+                var vdom = this.$prototype.render(this.$proxy);
             }
-            else{
+            else {
                 var html = this.$prototype.$factory(this.$proxy, this.$uuid);
                 var vdom = h2v(html);
                 // console.error(vdom)
@@ -113,7 +158,8 @@ class widget {
                 patch(this.$element, patches);
             }
             else {
-                var realDom = vdom.render();
+                // var realDom = vdom.render();
+                var realDom = el.prototype.render.call(vdom);
                 this.$element.parentNode.replaceChild(realDom, this.$element);
                 this.$element = realDom;
             }
@@ -138,7 +184,7 @@ class widget {
 
             this.$vdom = vdom;
 
-        },1000 / config.fps);
+        }, 1000 / config.fps);
 
     };
 
