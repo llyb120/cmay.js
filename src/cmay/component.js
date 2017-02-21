@@ -47,12 +47,17 @@ class component {
 
     walkNode(node,parentNode){
         if(typeof node == 'object'){
+            this.props = {}
             for(var i = 0; i < node.children.length; i++){
-                this.walkNode(node.children[i],parentNode);
+                this.walkNode(node.children[i],node);
             }
         }
         else{
+            if(node[0] == '?'){
+                if(node[1] == '?'){
 
+                }
+            }
         }
     }
 
